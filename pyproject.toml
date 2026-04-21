@@ -1,0 +1,36 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "districtapi"
+version = "0.2.0"
+description = "Python SDK for the districtapi.dev API — US school district and school data"
+readme = "README.md"
+license = { text = "MIT" }
+requires-python = ">=3.9"
+keywords = ["school district", "schools", "education", "nces", "api", "sdk"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Topic :: Internet :: WWW/HTTP",
+]
+dependencies = [
+    "httpx>=0.25.0",
+]
+
+[project.urls]
+Homepage = "https://districtapi.dev"
+Documentation = "https://districtapi.dev/docs"
+Repository = "https://github.com/districtapi/districtapi-python"
+"Bug Tracker" = "https://github.com/districtapi/districtapi-python/issues"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/districtapi"]
