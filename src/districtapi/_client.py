@@ -1,8 +1,8 @@
 from __future__ import annotations
-from typing import Optional
+from typing import Optional, Union
 import httpx
 from ._http import _raise_for_error
-from ._models import District, DistrictSummary, School
+from ._models import BatchResult, District, DistrictSummary, School
 
 BASE_URL = "https://api.districtapi.dev"
 
@@ -65,6 +65,40 @@ class DistrictResource:
         resp = self._http.get("/v1/districts/search", params=params)
         _raise_for_error(resp)
         return [DistrictSummary._from_dict(d) for d in resp.json()["data"]]
+
+    def batch(self, addresses: list[Union[str, dict]]) -> list[BatchResult]:
+        """
+        Resolve up to 100 (Pro) or 500 (Growth) addresses to districts in one call.
+        Requires a Pro or Growth API key. Each address costs 1 credit.
+        Results are returned in the same order as the input.
+
+        Args:
+            addresses: Either a list of address strings, or a list of dicts with
+                ``address`` (required) and optional ``ref`` (your caller-supplied
+                reference ID returned in each result).
+
+        Example:
+            results = client.districts.batch([
+                "1600 Pennsylvania Ave NW, Washington DC",
+                {"address": "14901 Dale Evans Pkwy, Apple Valley CA", "ref": "user-42"},
+            ])
+            for r in results:
+                print(r.ok, r.ref, r.district[0].name if r.ok and r.district else r.error)
+        """
+        items: list[dict] = []
+        for raw in addresses:
+            if isinstance(raw, str):
+                items.append({"address": raw})
+            elif isinstance(raw, dict):
+                addr = raw.get("address")
+                if not addr:
+                    raise ValueError("batch item dict must contain 'address'")
+                items.append({"address": addr, "ref": raw.get("ref")})
+            else:
+                raise TypeError(f"batch items must be str or dict, got {type(raw).__name__}")
+        resp = self._http.post("/v1/districts/batch", json={"addresses": items})
+        _raise_for_error(resp)
+        return [BatchResult._from_dict(r) for r in resp.json()["data"]]
 
 
 class SchoolResource:

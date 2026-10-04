@@ -19,6 +19,7 @@ GitHub:  https://github.com/districtapi/districtapi-python
 from ._client import DistrictAPI
 from ._async_client import AsyncDistrictAPI
 from ._models import (
+    BatchResult,
     District,
     DistrictSummary,
     School,
@@ -46,10 +47,11 @@ from ._exceptions import (
     InvalidParamsError,
 )
 
-__version__ = "0.2.0"
+__version__ = "0.3.0"
 __all__ = [
     "DistrictAPI",
     "AsyncDistrictAPI",
+    "BatchResult",
     "District",
     "DistrictSummary",
     "School",

@@ -331,6 +331,29 @@ class SchoolDistrictRef:
 
 
 @dataclass
+class BatchResult:
+    """One result row from the POST /v1/districts/batch endpoint."""
+    address: str = ""
+    ref: Optional[str] = None
+    ok: bool = False
+    # Populated when ok=True. Most addresses return 1 district, but some
+    # locations are served by overlapping elementary + high school districts.
+    district: Optional[list["District"]] = None
+    error: Optional[str] = None
+
+    @classmethod
+    def _from_dict(cls, d: dict) -> "BatchResult":
+        dlist = d.get("district")
+        return cls(
+            address=d.get("address", ""),
+            ref=d.get("ref"),
+            ok=d.get("ok", False),
+            district=[District._from_dict(x) for x in dlist] if isinstance(dlist, list) else None,
+            error=d.get("error"),
+        )
+
+
+@dataclass
 class School:
     nces_id: str
     nces_district_id: str
