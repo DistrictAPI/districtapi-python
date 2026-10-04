@@ -1,7 +1,7 @@
 from __future__ import annotations
 from typing import Optional, Union
 import httpx
-from ._http import _raise_for_error
+from ._http import _raise_for_error, _safe_id
 from ._models import BatchResult, District, DistrictSummary, School
 
 BASE_URL = "https://api.districtapi.dev"
@@ -35,13 +35,13 @@ class DistrictResource:
 
     def fetch(self, nces_id: str) -> District:
         """Fetch a district by its 7-digit NCES LEA ID."""
-        resp = self._http.get(f"/v1/districts/{nces_id}")
+        resp = self._http.get(f"/v1/districts/{_safe_id(nces_id, 'nces_id')}")
         _raise_for_error(resp)
         return District._from_dict(resp.json()["data"])
 
     def schools(self, nces_id: str) -> list[School]:
         """List all open schools in a district."""
-        resp = self._http.get(f"/v1/districts/{nces_id}/schools")
+        resp = self._http.get(f"/v1/districts/{_safe_id(nces_id, 'nces_id')}/schools")
         _raise_for_error(resp)
         return [School._from_dict(s) for s in resp.json()["data"]]
 
@@ -107,7 +107,7 @@ class SchoolResource:
 
     def fetch(self, nces_id: str) -> School:
         """Fetch a school by its 12-digit NCES school ID."""
-        resp = self._http.get(f"/v1/schools/{nces_id}")
+        resp = self._http.get(f"/v1/schools/{_safe_id(nces_id, 'nces_id')}")
         _raise_for_error(resp)
         return School._from_dict(resp.json()["data"])
 
@@ -134,7 +134,7 @@ class SchoolResource:
 
     def district(self, nces_school_id: str) -> District:
         """Get the district that a school belongs to."""
-        resp = self._http.get(f"/v1/schools/{nces_school_id}/district")
+        resp = self._http.get(f"/v1/schools/{_safe_id(nces_school_id, 'nces_school_id')}/district")
         _raise_for_error(resp)
         return District._from_dict(resp.json()["data"])
 
